@@ -19,7 +19,6 @@ public class RessourcenManagerImpl implements RessourcenManager {
     public RessourcenManagerImpl(int resourceID){
     	String resourceName = resourceID + " nutzdaten";
     	String resourceLogName = resourceID + " logdaten";
-System.out.println(resourceID);
         NUTZ_DATEN = new File(
         "./bestand/"+resourceName+".txt");
         LOG_DATEN = new File(
@@ -28,7 +27,6 @@ System.out.println(resourceID);
     	
 	@Override
 	public boolean write(int taid, int pid, String data) {
-System.out.println(taid +"....."+ pid);
 		boolean returnWert = false;
 		List<String> pufferTADaten = new ArrayList<String>();
 	    int logSN = this.getLogSN();
