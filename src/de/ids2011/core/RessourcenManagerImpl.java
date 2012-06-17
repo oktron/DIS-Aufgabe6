@@ -10,16 +10,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RessourcenManagerImpl implements RessourcenManager {
 
-	private static File NUTZ_DATEN = null;
-	private static File LOG_DATEN = null;
+	private File NUTZ_DATEN = null;
+	private File LOG_DATEN = null;
 	String toWrite;
 	private Hashtable<String, List<String>> puffer = new  Hashtable<String, List<String>>();
     private AtomicInteger logSNCounter = new AtomicInteger(1); 
 
     public RessourcenManagerImpl(int resourceID){
-    	String resourceName = resourceID + "ofNutzdaten";
-    	String resourceLogName = resourceID + "ofLogdaten";
-
+    	String resourceName = resourceID + " nutzdaten";
+    	String resourceLogName = resourceID + " logdaten";
+System.out.println(resourceID);
         NUTZ_DATEN = new File(
         "./bestand/"+resourceName+".txt");
         LOG_DATEN = new File(
@@ -28,6 +28,7 @@ public class RessourcenManagerImpl implements RessourcenManager {
     	
 	@Override
 	public boolean write(int taid, int pid, String data) {
+System.out.println(taid +"....."+ pid);
 		boolean returnWert = false;
 		List<String> pufferTADaten = new ArrayList<String>();
 	    int logSN = this.getLogSN();

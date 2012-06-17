@@ -1,11 +1,19 @@
 package de.ids2011.core;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class KoordinatorImpl implements Koordinator {
+    private AtomicInteger counter = new AtomicInteger(1); 
 
 	@Override
 	public int begin() {
-		// TODO Auto-generated method stub
-		return 0;
+		int taid;
+        boolean flag;     
+        do {     
+            taid = counter.get();       
+            flag = counter.compareAndSet(taid, taid + 1);     
+        } while (!flag);  
+        return taid;
 	}
 
 	@Override
