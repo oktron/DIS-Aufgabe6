@@ -73,14 +73,14 @@ public class RessourcenManagerImpl implements RessourcenManager {
 	@Override
 	public boolean prepare(int taid) {
         boolean prepFlag = false;	
-		if (!this.puffer.get(taid).isEmpty()) {
+		if (!this.puffer.get(taid+"").isEmpty()) {
 			prepFlag = true;
 			int logSN = this.getLogSN();
 			String strLogSN = null;
 			if (logSN<10) {
 				strLogSN = "0"+logSN;
 			}else strLogSN = logSN+"";               
-			String logFormat = strLogSN+","+taid+","+"vorbereite"+";"+"\n";
+			String logFormat = strLogSN+","+taid+","+" vorbereitet"+";"+"\n";
 			long len = logFormat.length();
 			RandomAccessFile raf;
 			try {
@@ -91,15 +91,15 @@ public class RessourcenManagerImpl implements RessourcenManager {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		}else System.out.println("es gibt nicht dieser Transaktion ID");
 		return prepFlag;
 	}
 
 	@Override
 	public void commit(int taid) {
 		try{			
-			if (this.puffer.containsKey(taid)){
-				List<String> TADaten = this.puffer.remove(taid);
+			if (this.puffer.containsKey(taid+"")){
+				List<String> TADaten = this.puffer.remove(taid+"");
 				String einCommit = TADaten.get(0);
 				int commaPosition = einCommit.indexOf(",");
 				RandomAccessFile raf = new RandomAccessFile(NUTZ_DATEN, "rw");
@@ -118,13 +118,13 @@ public class RessourcenManagerImpl implements RessourcenManager {
 				if (logSN<10) {
 					strLogSN = "0"+logSN;
 				}else strLogSN = logSN+"";                
-				String logFormat = strLogSN+","+taid+","+"committeds"+";"+"\n";
+				String logFormat = strLogSN+","+taid+","+"   committed"+";"+"\n";
 				long len = logFormat.length();
 				RandomAccessFile rafLog = new RandomAccessFile(this.LOG_DATEN, "rw");;
 				rafLog.seek(Integer.valueOf(logSN-1)*len);
 				rafLog.writeBytes(logFormat); 
 				rafLog.close();							
-			}else System.out.println("Es gibt nicht dieser Schluessel ");
+			}else System.out.println("Es gibt nicht dieser Transaktion ID ");
 		}catch(IOException e){
 			e.printStackTrace();
 		}catch (Exception ex) {
@@ -134,14 +134,14 @@ public class RessourcenManagerImpl implements RessourcenManager {
 
 	@Override
 	public void rollback(int taid) {
-		if (this.puffer.containsKey(taid)){ 
-			this.puffer.remove(taid);
+		if (this.puffer.containsKey(taid+"")){ 
+			this.puffer.remove(taid+"");
 			int logSN = this.getLogSN();
 			String strLogSN = null;
 			if (logSN<10) {
 				strLogSN = "0"+logSN;
 			}else strLogSN = logSN+"";               
-			String logFormat = strLogSN+","+taid+","+"ruecksetzt"+";"+"\n";
+			String logFormat = strLogSN+","+taid+","+"rueckgesetzt"+";"+"\n";
 			long len = logFormat.length();
 			RandomAccessFile raf;
 			try {
@@ -152,7 +152,7 @@ public class RessourcenManagerImpl implements RessourcenManager {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		}else System.out.println("Es gibt nicht dieser Transaktion ID");
 	}
 	
 	private int getLogSN(){
