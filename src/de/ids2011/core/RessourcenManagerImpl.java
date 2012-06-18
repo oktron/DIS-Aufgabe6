@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RessourcenManagerImpl implements RessourcenManager {
@@ -13,10 +14,12 @@ public class RessourcenManagerImpl implements RessourcenManager {
 	private File NUTZ_DATEN = null;
 	private File LOG_DATEN = null;
 	String toWrite;
+	int resourceID;
 	private Hashtable<String, List<String>> puffer = new  Hashtable<String, List<String>>();
     private AtomicInteger logSNCounter = new AtomicInteger(1); 
 
     public RessourcenManagerImpl(int resourceID){
+    	this.resourceID = resourceID;
     	String resourceName = resourceID + " nutzdaten";
     	String resourceLogName = resourceID + " logdaten";
         NUTZ_DATEN = new File(
@@ -91,7 +94,16 @@ public class RessourcenManagerImpl implements RessourcenManager {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else System.out.println("es gibt nicht dieser Transaktion ID");
+		}else System.out.println("es gibt nicht dieser Transaktion ID bei Prepare");
+		
+		/* Transaktion 3 wird als eine
+		 *  prepare-Anweisung gelegentlich mit aborted antworten, 
+		 *  um das Funktionieren des Protokolls auch im Fehlerfall zu zeigen
+		 */
+		if (taid==3) {
+			prepFlag = this.zufaelligStuetze();
+            System.out.println("zufaellig prepared Flag: "+prepFlag);
+		}
 		return prepFlag;
 	}
 
@@ -124,7 +136,7 @@ public class RessourcenManagerImpl implements RessourcenManager {
 				rafLog.seek(Integer.valueOf(logSN-1)*len);
 				rafLog.writeBytes(logFormat); 
 				rafLog.close();							
-			}else System.out.println("Es gibt nicht dieser Transaktion ID ");
+			}else System.out.println("Es gibt nicht dieser Transaktion ID bei Commit");
 		}catch(IOException e){
 			e.printStackTrace();
 		}catch (Exception ex) {
@@ -133,9 +145,13 @@ public class RessourcenManagerImpl implements RessourcenManager {
 	}
 
 	@Override
-	public void rollback(int taid) {
+	public boolean rollback(int taid) {
+		boolean flag = false;
 		if (this.puffer.containsKey(taid+"")){ 
 			this.puffer.remove(taid+"");
+			if (this.puffer.isEmpty()) {
+				flag = true;
+			}
 			int logSN = this.getLogSN();
 			String strLogSN = null;
 			if (logSN<10) {
@@ -152,7 +168,11 @@ public class RessourcenManagerImpl implements RessourcenManager {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else System.out.println("Es gibt nicht dieser Transaktion ID");
+			return flag;
+		}else {
+			System.out.println("Es gibt nicht dieser Transaktion ID bei Rollback");
+			return flag;
+		}
 	}
 	
 	private int getLogSN(){
@@ -183,6 +203,19 @@ public class RessourcenManagerImpl implements RessourcenManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	//testen zufaellige System Abstuetze
+	private boolean zufaelligStuetze(){
+		Random random = new Random();
+		return random.nextBoolean();
+	}
+
+	/**
+	 * @return the resourceID
+	 */
+	public int getResourceID() {
+		return resourceID;
 	}
 
 }

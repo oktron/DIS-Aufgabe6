@@ -11,7 +11,7 @@ public class StartUp {
 		Koordinator kdn = KoordinatorImpl.getInstance();
 		int rscID = 1;
 		
-        // 1.Transaktion
+        // 1.Transaktion rollback
 		int taid = kdn.begin();
 		RessourcenManager rm1 = new RessourcenManagerImpl(rscID);
         kdn.reg(rm1, taid);
@@ -24,7 +24,7 @@ public class StartUp {
 		rm2.write(taid,taid*10+3, awd.getClientName());
 		kdn.rollback(taid);
 		
-		// 2.Transaktion
+		// 2.Transaktion commit
 		taid = kdn.begin();
 		RessourcenManager rm3 = new RessourcenManagerImpl(++rscID);
         kdn.reg(rm3, taid);
@@ -42,6 +42,26 @@ public class StartUp {
 		rm4.write(taid,taid*10+6, awd.getClientName());
 		rm5.write(taid,taid*10+7, awd.getClientName());
 		kdn.commit(taid);
+		
+		//TODO Ressourcen-Manager sollen im Rahmen der Aufgabe auf 
+		//eine prepare-Anweisung gelegentlich mit aborted antworten, 
+		//um das Funktionieren des Protokolls auch im Fehlerfall zu zeigen.
+		
+		// 3.Transaktion commit
+		taid = kdn.begin();
+		RessourcenManager rm6 = new RessourcenManagerImpl(++rscID);
+        kdn.reg(rm6, taid);
+		RessourcenManager rm7 = new RessourcenManagerImpl(++rscID);
+        kdn.reg(rm7, taid);
+		RessourcenManager rm8 = new RessourcenManagerImpl(++rscID);
+        kdn.reg(rm8, taid);
+		rm6.write(taid,taid*10, awd.getClientName());
+		rm7.write(taid,taid*10, awd.getClientName());
+		rm8.write(taid,taid*10+1, awd.getClientName());
+		rm7.write(taid,taid*10+2, awd.getClientName());
+		rm6.write(taid,taid*10+3, awd.getClientName());
+		kdn.commit(taid);
+        
 	}
 
 }

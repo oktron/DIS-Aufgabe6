@@ -1,5 +1,7 @@
 package de.ids2011.core;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -9,6 +11,8 @@ public class KoordinatorImpl implements Koordinator {
     private AtomicInteger counter = new AtomicInteger(1);
 	private static volatile Koordinator _instance;	
 	private Hashtable<Integer, List<RessourcenManager>> rmList = new  Hashtable<Integer, List<RessourcenManager>>();
+	private File LOG_DATEN = null;
+    private AtomicInteger logSNCounter = new AtomicInteger(1); 
 
 	public static Koordinator getInstance() { 
 		if (_instance == null) {
@@ -21,6 +25,10 @@ public class KoordinatorImpl implements Koordinator {
 		return _instance;
 	}
     
+	private KoordinatorImpl(){
+        LOG_DATEN = new File(
+        "./bestand/"+"kdnLogdaten.txt");
+	}
 	
 	@Override
 	public int begin() {
@@ -40,7 +48,7 @@ public class KoordinatorImpl implements Koordinator {
 		List<RessourcenManager> tmpList = this.rmList.get(taid);
 		for (int i = 0; i < tmpList.size(); i++) {
 			tmpRM = tmpList.get(i);
-			flag = flag && tmpRM.prepare(taid);
+			flag &= tmpRM.prepare(taid);
 		}
 		if (flag) {
 			for (int i = 0; i < tmpList.size(); i++) {
@@ -48,19 +56,55 @@ public class KoordinatorImpl implements Koordinator {
 				tmpRM.commit(taid);
 			}
 		}
+		int logSN = this.getLogSN();
+		String strLogSN = null;
+		if (logSN<10) {
+			strLogSN = "0"+logSN;
+		}else strLogSN = logSN+"";  
+		String logFormat = null;
+		logFormat = strLogSN+","+taid+","+"   committed"+";"+"\n";
+		long len = logFormat.length();
+		RandomAccessFile raf;
+		try {
+			raf = new RandomAccessFile(this.LOG_DATEN, "rw");
+			raf.seek(Integer.valueOf(logSN-1)*len);
+			raf.writeBytes(logFormat); 
+			raf.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Transaktion " + taid+ " commit: " + flag );
 		return flag;
 	}
 
 	@Override
 	public boolean rollback(int taid) {
-		boolean flag = false;
+		boolean flag = true;
 		RessourcenManager tmpRM;
 		List<RessourcenManager> tmpList = this.rmList.get(taid);
 		for (int i = 0; i < tmpList.size(); i++) {
 			tmpRM = tmpList.get(i);
-			tmpRM.rollback(taid);
+			flag = flag && tmpRM.rollback(taid);
 		}
-		if(this.rmList.get(taid) == null) flag = true;
+		if(flag){
+			int logSN = this.getLogSN();
+			String strLogSN = null;
+			if (logSN<10) {
+				strLogSN = "0"+logSN;
+			}else strLogSN = logSN+"";               
+			String logFormat = strLogSN+","+taid+","+"rueckgesetzt"+";"+"\n";
+			long len = logFormat.length();
+			RandomAccessFile raf;
+			try {
+				raf = new RandomAccessFile(this.LOG_DATEN, "rw");
+				raf.seek(Integer.valueOf(logSN-1)*len);
+				raf.writeBytes(logFormat); 
+				raf.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Transaktion " + taid+ " rollback: " + flag );
 		return flag;
 	}
 
@@ -79,7 +123,19 @@ public class KoordinatorImpl implements Koordinator {
 		else tmpList.add(rm);
 		this.rmList.put(taid, tmpList);
 		flag = true;
+		System.out.println("RessourcenManager von " + taid+" "+" rm"+ rm.getResourceID()  
+				+" "+ " registriert sich: " + flag );
 		return flag;
+	}
+	
+	private int getLogSN(){
+		int logSN;
+        boolean flag;     
+        do {     
+        	logSN = this.logSNCounter.get();     
+            flag = logSNCounter.compareAndSet(logSN, logSN + 1);     
+        } while (!flag); 
+		return logSN;
 	}
 
 }

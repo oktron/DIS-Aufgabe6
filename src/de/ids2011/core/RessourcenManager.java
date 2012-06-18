@@ -38,6 +38,12 @@ public interface RessourcenManager
 	 * 
 	 * @param taid
 	 *            The transaction id
+	 * @return 
 	 */
-	public void rollback(int taid);
+	public boolean rollback(int taid);
+	
+	/**
+	 * @return the resourceID
+	 */
+	public int getResourceID() ;
 }
