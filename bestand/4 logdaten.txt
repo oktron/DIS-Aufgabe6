@@ -1,0 +1,5 @@
+01,2,21,anwendung;
+02,2,22,anwendung;
+03,2,26,anwendung;
+04,2, vorbereitet;
+05,2,   committed;
