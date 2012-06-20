@@ -47,9 +47,9 @@ public class FileRessourcenManager implements RessourcenManager
 		// random abort
 		// FIXME: seems that no random integer is generated
 		// same result for all
-//		if ((new Random()).nextBoolean()) {
-//			return false;
-//		}
+		if ((new Random()).nextInt(100) < 50) {
+			return false;
+		}
 		
 		Map<Integer, String> bufferData;
 		Set<Integer> preparedPages = new HashSet<Integer>();
