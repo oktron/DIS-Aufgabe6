@@ -17,7 +17,7 @@ public interface Koordinator
 	 * 
 	 * @return true if commit was successful, else false
 	 */
-	public boolean commit(int taid);
+	public boolean commit(int taid) throws IllegalArgumentException;
 
 	/**
 	 * Rolls back the transaction
@@ -27,7 +27,7 @@ public interface Koordinator
 	 * 
 	 * @return true if rollback was successful, else false
 	 */
-	public boolean rollback(int taid);
+	public boolean rollback(int taid) throws IllegalArgumentException;
 
 	/**
 	 * Registers the given resource manager with the coordinator for the given
@@ -40,5 +40,4 @@ public interface Koordinator
 	 * @return true if registration was successful, else false
 	 */
 	public boolean reg(RessourcenManager rm, int taid);
-
 }

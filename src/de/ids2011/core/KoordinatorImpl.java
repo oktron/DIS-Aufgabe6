@@ -123,8 +123,8 @@ public class KoordinatorImpl implements Koordinator {
 		else tmpList.add(rm);
 		this.rmList.put(taid, tmpList);
 		flag = true;
-		System.out.println("RessourcenManager von " + taid+" "+" rm"+ rm.getResourceID()  
-				+" "+ " registriert sich: " + flag );
+//		System.out.println("RessourcenManager von " + taid+" "+" rm"+ rm.getResourceID()  
+//				+" "+ " registriert sich: " + flag );
 		return flag;
 	}
 	

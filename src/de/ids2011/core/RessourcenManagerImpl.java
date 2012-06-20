@@ -108,7 +108,8 @@ public class RessourcenManagerImpl implements RessourcenManager {
 	}
 
 	@Override
-	public void commit(int taid) {
+	public boolean commit(int taid) {
+		boolean result = false;
 		try{			
 			if (this.puffer.containsKey(taid+"")){
 				List<String> TADaten = this.puffer.remove(taid+"");
@@ -135,13 +136,16 @@ public class RessourcenManagerImpl implements RessourcenManager {
 				RandomAccessFile rafLog = new RandomAccessFile(this.LOG_DATEN, "rw");;
 				rafLog.seek(Integer.valueOf(logSN-1)*len);
 				rafLog.writeBytes(logFormat); 
-				rafLog.close();							
+				rafLog.close();
+				result = true;
 			}else System.out.println("Es gibt nicht dieser Transaktion ID bei Commit");
 		}catch(IOException e){
 			e.printStackTrace();
 		}catch (Exception ex) {
             ex.printStackTrace();
 		}
+		
+		return result;
 	}
 
 	@Override

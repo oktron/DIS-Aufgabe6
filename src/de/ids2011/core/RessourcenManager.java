@@ -20,7 +20,6 @@ public interface RessourcenManager
 	 * 
 	 * @param taid
 	 *            The transaction id
-	 * 
 	 * @return true if preparing was successful, else false
 	 */
 	public boolean prepare(int taid);
@@ -30,20 +29,16 @@ public interface RessourcenManager
 	 * 
 	 * @param taid
 	 *            The transaction id
+	 * @return true if commit was successful, else false
 	 */
-	public void commit(int taid);
+	public boolean commit(int taid);
 
 	/**
 	 * Abort the transaction
 	 * 
 	 * @param taid
 	 *            The transaction id
-	 * @return 
+	 * @return true if rollback was successful, else false
 	 */
 	public boolean rollback(int taid);
-	
-	/**
-	 * @return the resourceID
-	 */
-	public int getResourceID() ;
 }
