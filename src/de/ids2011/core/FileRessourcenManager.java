@@ -44,10 +44,7 @@ public class FileRessourcenManager implements RessourcenManager
 	@Override
 	public boolean prepare(int taid)
 	{
-		// random abort
-		// FIXME: seems that no random integer is generated
-		// same result for all
-		if ((new Random()).nextInt(100) < 50) {
+		if ((new Random()).nextInt(100) < 80) {
 			return false;
 		}
 		
