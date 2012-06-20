@@ -120,7 +120,7 @@ public class FileRessourcenManager implements RessourcenManager
 			Set<Integer> preparedPages = _preparedPages.get(taid);
 			
 			for (int page : preparedPages) {
-				boolean deleted = (new File(page+".tmp").delete());
+				boolean deleted = (new File(FileRessourcenManager.PREFIX + page + FileRessourcenManager.SUFFIX).delete());
 				
 				if (deleted) {
 					preparedPages.remove(page);
